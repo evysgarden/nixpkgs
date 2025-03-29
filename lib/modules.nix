@@ -376,7 +376,7 @@ let
       loadModule =
         args: fallbackFile: fallbackKey: m:
         if isFunction m then
-          unifyModuleSyntax fallbackFile fallbackKey (applyModuleArgs fallbackKey m args)
+          loadModule args fallbackFile fallbackKey (applyModuleArgs fallbackKey m args)
         else if isAttrs m then
           if m._type or "module" == "module" then
             unifyModuleSyntax fallbackFile fallbackKey m
@@ -401,10 +401,7 @@ let
             ];
           in
           throw "Module imports can't be nested lists. Perhaps you meant to remove one level of lists? Definitions: ${showDefs defs}"
-        else
-          unifyModuleSyntax (toString m) (toString m) (
-            applyModuleArgsIfFunction (toString m) (import m) args
-          );
+        else loadModule args (toString m) (toString m) (import m);
 
       checkModule =
         if class != null then
