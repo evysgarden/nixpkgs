@@ -383,11 +383,17 @@ let
           else if m._type == "if" || m._type == "override" then
             let
               inner = loadModule args fallbackFile fallbackKey m.content;
-            in inner // {
+            in
+            inner
+            // {
               # We only push down into `imports` and `config`.
               # It doesn't make any sense for the others.
-              imports = m // { content = inner.imports; };
-              config = m // { content = inner.config; };
+              imports = m // {
+                content = inner.imports;
+              };
+              config = m // {
+                content = inner.config;
+              };
             }
           else
             throw (
@@ -408,7 +414,8 @@ let
             ];
           in
           throw "Module imports can't be nested lists. Perhaps you meant to remove one level of lists? Definitions: ${showDefs defs}"
-        else loadModule args (toString m) (toString m) (import m);
+        else
+          loadModule args (toString m) (toString m) (import m);
 
       checkModule =
         if class != null then
@@ -624,11 +631,11 @@ let
         name: _: addErrorContext (context name) (args.${name} or config._module.args.${name})
       ) (functionArgs f);
 
-      # Note: we append in the opposite order such that we can add an error
-      # context on the explicit arguments of "args" too. This update
-      # operator is used to make the "args@{ ... }: with args.lib;" notation
-      # works.
     in
+    # Note: we append in the opposite order such that we can add an error
+    # context on the explicit arguments of "args" too. This update
+    # operator is used to make the "args@{ ... }: with args.lib;" notation
+    # works.
     f (args // extraArgs);
 
   /*
